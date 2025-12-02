@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "@privy-io/expo-starter",
+    "slug": "privy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "privymv",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "usesAppleSignIn": true,
+      "supportsTablet": true,
+      "bundleIdentifier": "com.besimon.privy",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "appleTeamId": "7QV8C5V96E"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.besimon.privy"
+    },
+    "extra": {
+      "privyAppId": "cmiolyvvx04pylb0cgggelpwy",
+      "privyClientId": "client-WY6TNxZccF9nZw9GgyJeBcwqDoAPCEkFSuky57EgiqmW7",
+      "router": {},
+      "eas": {
+        "projectId": "f58c5220-2b00-49a8-855f-c66a087146d6"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-apple-authentication",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.5"
+          },
+          "android": {
+            "compileSdkVersion": 35
+          }
+        }
+      ],
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "owner": "besimon"
+  }
+}
