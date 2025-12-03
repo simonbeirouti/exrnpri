@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 import { useState } from "react";
+import { useTheme } from "@react-navigation/native";
 
 import { View, Text, Button, TextInput } from "react-native";
 import { useLinkWithPasskey } from "@privy-io/expo/passkey";
@@ -10,6 +11,7 @@ import {
   useLinkWithFarcaster,
 } from "@privy-io/expo";
 export default function LinkAccounts() {
+  const theme = useTheme();
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -65,7 +67,7 @@ export default function LinkAccounts() {
   return (
     <View>
       {/* Links Accounts */}
-      <Text>Link Accounts</Text>
+      <Text style={{ color: theme.colors.text, fontWeight: "bold", fontSize: 16 }}>Link Accounts</Text>
 
       <View
         style={{
@@ -111,23 +113,24 @@ export default function LinkAccounts() {
           display: "flex",
           flexDirection: "column",
           gap: 10,
-          borderBlockColor: "black",
+          borderColor: theme.colors.border,
           borderWidth: 1,
           padding: 10,
         }}
       >
-        <Text>Link Email</Text>
+        <Text style={{ color: theme.colors.text }}>Link Email</Text>
         <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
+            placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
             style={{
               borderWidth: 1,
-              borderColor: "black",
+              borderColor: theme.colors.border,
               padding: 10,
               margin: 10,
-              color: "black",
+              color: theme.colors.text,
             }}
           />
           <Button title="Get Code" onPress={() => sendCodeEmail({ email })} />
@@ -138,12 +141,13 @@ export default function LinkAccounts() {
             onChangeText={setEmailCode}
             placeholder="Code"
             inputMode="numeric"
+            placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
             style={{
               borderWidth: 1,
-              borderColor: "black",
+              borderColor: theme.colors.border,
               padding: 10,
               margin: 10,
-              color: "black",
+              color: theme.colors.text,
             }}
           />
           <Button
@@ -157,23 +161,24 @@ export default function LinkAccounts() {
           display: "flex",
           flexDirection: "column",
           gap: 10,
-          borderBlockColor: "black",
+          borderColor: theme.colors.border,
           borderWidth: 1,
           padding: 10,
         }}
       >
-        <Text>Link SMS</Text>
+        <Text style={{ color: theme.colors.text }}>Link SMS</Text>
         <View style={{ display: "flex", flexDirection: "row", gap: 10 }}>
           <TextInput
             value={phone}
             onChangeText={setPhone}
             placeholder="Phone"
+            placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
             style={{
               borderWidth: 1,
-              borderColor: "black",
+              borderColor: theme.colors.border,
               padding: 10,
               margin: 10,
-              color: "black",
+              color: theme.colors.text,
             }}
           />
           <Button title="Link SMS" onPress={() => sendCodeSMS({ phone })} />
@@ -184,12 +189,13 @@ export default function LinkAccounts() {
             onChangeText={setSmsCode}
             placeholder="Code"
             inputMode="numeric"
+            placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
             style={{
               borderWidth: 1,
-              borderColor: "black",
+              borderColor: theme.colors.border,
               padding: 10,
               margin: 10,
-              color: "black",
+              color: theme.colors.text,
             }}
           />
           <Button

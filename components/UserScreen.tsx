@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Text, TextInput, View, Button, ScrollView } from "react-native";
+import { useTheme } from "@react-navigation/native";
 
 import {
   usePrivy,
@@ -39,6 +40,7 @@ const toMainIdentifier = (x: PrivyUser["linked_accounts"][number]) => {
 export const UserScreen = () => {
   const [chainId, setChainId] = useState("1");
   const [signedMessages, setSignedMessages] = useState<string[]>([]);
+  const theme = useTheme();
 
   const { logout, user } = usePrivy();
   const { linkWithPasskey } = useLinkWithPasskey();
@@ -87,7 +89,7 @@ export const UserScreen = () => {
       <LinkAccounts />
       <UnlinkAccounts />
       <Wallets />
-      <ScrollView style={{ borderColor: "rgba(0,0,0,0.1)", borderWidth: 1 }}>
+      <ScrollView style={{ borderColor: theme.colors.border, borderWidth: 1 }}>
         <View
           style={{
             padding: 20,
@@ -97,19 +99,19 @@ export const UserScreen = () => {
           }}
         >
           <View>
-            <Text style={{ fontWeight: "bold" }}>User ID</Text>
-            <Text>{user.id}</Text>
+            <Text style={{ fontWeight: "bold", color: theme.colors.text }}>User ID</Text>
+            <Text style={{ color: theme.colors.text }}>{user.id}</Text>
           </View>
 
           <View>
-            <Text style={{ fontWeight: "bold" }}>Linked accounts</Text>
+            <Text style={{ fontWeight: "bold", color: theme.colors.text }}>Linked accounts</Text>
             {user?.linked_accounts.length ? (
               <View style={{ display: "flex", flexDirection: "column" }}>
                 {user?.linked_accounts?.map((m, index) => (
                   <Text
                     key={`linked-account-${m.type}-${m.verified_at}-${index}`}
                     style={{
-                      color: "rgba(0,0,0,0.5)",
+                      color: theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
                       fontSize: 12,
                       fontStyle: "italic",
                     }}
@@ -124,17 +126,25 @@ export const UserScreen = () => {
           <View>
             {account?.address && (
               <>
-                <Text style={{ fontWeight: "bold" }}>Embedded Wallet</Text>
-                <Text>{account?.address}</Text>
+                <Text style={{ fontWeight: "bold", color: theme.colors.text }}>Embedded Wallet</Text>
+                <Text style={{ color: theme.colors.text }}>{account?.address}</Text>
               </>
             )}
 
             <>
-              <Text>Chain ID to set to:</Text>
+              <Text style={{ color: theme.colors.text }}>Chain ID to set to:</Text>
               <TextInput
                 value={chainId}
                 onChangeText={setChainId}
                 placeholder="Chain Id"
+                placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
+                style={{
+                  color: theme.colors.text,
+                  borderColor: theme.colors.border,
+                  borderWidth: 1,
+                  padding: 8,
+                  borderRadius: 4,
+                }}
               />
               <Button
                 title="Switch Chain"

@@ -1,12 +1,15 @@
-import { Linking, Text, View } from "react-native";
-import Constants from "expo-constants";
-import * as Application from "expo-application";
-import PasskeyLogin from "./login/PasskeyLogin";
-import OAuth from "./login/OAuth";
+import { View } from "react-native";
+import { useTheme } from "@react-navigation/native";
 import PrivyUI from "./login/PrivyUI";
-import SMSLogin from "./login/SMS";
+// import Constants from "expo-constants";
+// import * as Application from "expo-application";
+// import OAuth from "./login/OAuth";
+// import PasskeyLogin from "./login/PasskeyLogin";
+// import SMSLogin from "./login/SMS";
 
 export default function LoginScreen() {
+  const theme = useTheme();
+
   return (
     <View
       style={{
@@ -14,55 +17,13 @@ export default function LoginScreen() {
         justifyContent: "center",
         alignItems: "center",
         gap: 10,
-        marginHorizontal: 10,
+        backgroundColor: theme.colors.background,
       }}
     >
-      <Text>Privy App ID:</Text>
-      <Text style={{ fontSize: 10 }}>
-        {Constants.expoConfig?.extra?.privyAppId}
-      </Text>
-      <Text>Privy Client ID:</Text>
-      <Text style={{ fontSize: 10 }}>
-        {Constants.expoConfig?.extra?.privyClientId}
-      </Text>
-      <Text>
-        Navigate to your{" "}
-        <Text
-          onPress={() =>
-            Linking.openURL(
-              `https://dashboard.privy.io/apps/${Constants.expoConfig?.extra?.privyAppId}/settings?setting=clients`
-            )
-          }
-        >
-          dashboard
-        </Text>{" "}
-        and ensure the following Expo Application ID is listed as an `Allowed
-        app identifier`:
-      </Text>
-      <Text style={{ fontSize: 10 }}>{Application.applicationId}</Text>
-      <Text>
-        Navigate to your{" "}
-        <Text
-          onPress={() =>
-            Linking.openURL(
-              `https://dashboard.privy.io/apps/${Constants.expoConfig?.extra?.privyAppId}/settings?setting=clients`
-            )
-          }
-        >
-          dashboard
-        </Text>{" "}
-        and ensure the following value is listed as an `Allowed app URL scheme`:
-      </Text>
-      <Text style={{ fontSize: 10 }}>
-        {Application.applicationId === "host.exp.Exponent"
-          ? "exp"
-          : Constants.expoConfig?.scheme}
-      </Text>
-
       <PrivyUI />
-      <SMSLogin />
-      <PasskeyLogin />
-      <OAuth />
+      {/* <SMSLogin /> */}
+      {/* <PasskeyLogin /> */}
+      {/* <OAuth /> */}
     </View>
   );
 }

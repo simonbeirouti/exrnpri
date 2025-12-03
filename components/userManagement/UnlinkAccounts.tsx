@@ -1,9 +1,11 @@
 import Constants from "expo-constants";
 import { useState } from "react";
 import { View, Text, Button } from "react-native";
+import { useTheme } from "@react-navigation/native";
 
 import { usePrivy, useUnlinkOAuth, useUnlinkFarcaster } from "@privy-io/expo";
 export default function UnlinkAccounts() {
+  const theme = useTheme();
   const [error, setError] = useState("");
   const { user } = usePrivy();
   const { unlinkFarcaster } = useUnlinkFarcaster({
@@ -25,7 +27,7 @@ export default function UnlinkAccounts() {
   return (
     <View>
       {/* Links Accounts */}
-      <Text>Unlink Accounts</Text>
+      <Text style={{ color: theme.colors.text, fontWeight: "bold", fontSize: 16 }}>Unlink Accounts</Text>
 
       <View
         style={{

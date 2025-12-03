@@ -1,8 +1,10 @@
 import { useEmbeddedEthereumWallet } from "@privy-io/expo";
 import { useState } from "react";
 import { View, Text, Button } from "react-native";
+import { useTheme } from "@react-navigation/native";
 
 export default function EVMWalletActions() {
+  const theme = useTheme();
   const [result, setResult] = useState<string | null>(null);
   const { wallets } = useEmbeddedEthereumWallet();
   const wallet = wallets?.[0];
@@ -56,14 +58,14 @@ export default function EVMWalletActions() {
   };
   return (
     <View>
-      <Text>EVM Wallet Actions</Text>
+      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>EVM Wallet Actions</Text>
       <Button title="Sign Message" onPress={signMessage} />
       <Button title="Sign Transaction" onPress={signTransaction} />
       <Button
         title="Sign And Send Transaction"
         onPress={signAndSendTransaction}
       />
-      {result && <Text>{result}</Text>}
+      {result && <Text style={{ color: theme.colors.text }}>{result}</Text>}
     </View>
   );
 }

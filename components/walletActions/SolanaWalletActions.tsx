@@ -1,6 +1,7 @@
 import { useEmbeddedSolanaWallet } from "@privy-io/expo";
 import { View, Text, Button } from "react-native";
 import { useState } from "react";
+import { useTheme } from "@react-navigation/native";
 
 import {
   Connection,
@@ -10,6 +11,7 @@ import {
 } from "@solana/web3.js";
 
 export default function SolanaWalletActions() {
+  const theme = useTheme();
   const { wallets } = useEmbeddedSolanaWallet();
   const wallet = wallets?.[0];
   const [result, setResult] = useState<string | null>(null);
@@ -96,14 +98,14 @@ export default function SolanaWalletActions() {
   };
   return (
     <View>
-      <Text>Solana Wallet Actions</Text>
+      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>Solana Wallet Actions</Text>
       <Button title="Sign Message" onPress={signMessage} />
       <Button title="Sign Transaction" onPress={signTransaction} />
       <Button
         title="Sign And Send Transaction"
         onPress={signAndSendTransaction}
       />
-      {result && <Text>{result}</Text>}
+      {result && <Text style={{ color: theme.colors.text }}>{result}</Text>}
     </View>
   );
 }

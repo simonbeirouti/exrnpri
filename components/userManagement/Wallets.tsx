@@ -6,8 +6,10 @@ import {
 import { useCreateWallet } from "@privy-io/expo/extended-chains";
 import { View, Text, Button } from "react-native";
 import { useState } from "react";
+import { useTheme } from "@react-navigation/native";
 
 export default function Wallets() {
+  const theme = useTheme();
   const [error, setError] = useState<string | null>(null);
   const { user } = usePrivy();
   const { create: createEthereumWallet } = useEmbeddedEthereumWallet();
@@ -67,11 +69,11 @@ export default function Wallets() {
         flexDirection: "column",
         gap: 10,
         borderWidth: 1,
-        borderColor: "black",
+        borderColor: theme.colors.border,
         padding: 10,
       }}
     >
-      <Text>Wallets</Text>
+      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>Wallets</Text>
 
       <View
         style={{
