@@ -34,20 +34,11 @@ const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center', // Center the text for action rows usually? Or keep it left aligned?
-        // The user said "just text". Usually action rows like "Logout" are centered or left aligned.
-        // SettingsRow has left aligned text. I'll stick to left aligned to match, or maybe center if it's a button-like action.
-        // Let's look at SettingsRow again. It has `alignItems: 'center'` on container, and `justifyContent: 'center'` on contentContainer.
-        // But `contentContainer` in SettingsRow has `flex: 1`.
-        // If I want it to look like a row but just text, I should probably keep it left aligned like the others, OR center it if it's a "button".
-        // "display the button and instead just text" -> implies it replaces a button.
-        // I will default to centered text for "Action" rows as they are often buttons in disguise, but I'll make it configurable if needed.
-        // Actually, looking at standard iOS settings, "Log Out" is often a cell with centered red text.
-        // I will center it by default.
+        alignItems: 'center',
     },
     title: {
         fontSize: 16,
         fontWeight: '500',
-        textAlign: 'center', // Center text
+        textAlign: 'center',
     },
 });
