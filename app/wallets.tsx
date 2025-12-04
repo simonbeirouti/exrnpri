@@ -17,7 +17,7 @@ export default function WalletsScreen() {
 
 const styles = StyleSheet.create({
     content: {
-        padding: 20,
-        gap: 20,
+        padding: 10,
+        gap: 10,
     },
 });

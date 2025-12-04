@@ -4,7 +4,8 @@ import {
   usePrivy,
 } from "@privy-io/expo";
 import { useCreateWallet } from "@privy-io/expo/extended-chains";
-import { View, Text, Button } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTheme } from "@react-navigation/native";
 
@@ -23,11 +24,11 @@ export default function Wallets() {
     | "bitcoin-segwit"
     | "stellar"
     | "cosmos"
-    | "sui"
-    | "tron"
     | "near"
-    | "ton"
-    | "spark";
+  // | "sui"
+  // | "tron"
+  // | "ton"
+  // | "spark";
   type chainTypes = "ethereum" | "solana" | ExtendedChainType;
 
   const ALL_CHAIN_TYPES: chainTypes[] = [
@@ -36,11 +37,11 @@ export default function Wallets() {
     "bitcoin-segwit",
     "stellar",
     "cosmos",
-    "sui",
-    "tron",
     "near",
-    "ton",
-    "spark",
+    // "sui",
+    // "tron",
+    // "ton",
+    // "spark",
   ];
 
   const createWallets = (chainType: chainTypes) => {
@@ -68,29 +69,53 @@ export default function Wallets() {
         display: "flex",
         flexDirection: "column",
         gap: 10,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
-        padding: 10,
       }}
     >
-      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>Wallets</Text>
 
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 10,
-          flexWrap: "wrap",
-        }}
-      >
-        {ALL_CHAIN_TYPES.map((chainType, i) => (
-          <Button
-            key={`create-wallet-${chainType}-${i}`}
-            title={`Create ${chainType} Wallet`}
-            onPress={() => createWallets(chainType)}
-          />
-        ))}
-      </View>
+      {ALL_CHAIN_TYPES.map((chainType) => {
+        const chainWallets = wallets?.filter((w) => w.chain_type === chainType) || [];
+        return (
+          <View key={chainType} style={{ gap: 5 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingVertical: 5,
+                borderBottomWidth: 1,
+                borderBottomColor: theme.colors.border,
+              }}
+            >
+              <Text
+                style={{
+                  color: theme.colors.text,
+                  fontWeight: "600",
+                  textTransform: "capitalize",
+                }}
+              >
+                {chainType}
+              </Text>
+              <TouchableOpacity onPress={() => createWallets(chainType)}>
+                <Ionicons name="add" size={24} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+            {chainWallets.length > 0 ? (
+              chainWallets.map((wallet, index) => (
+                <Text
+                  key={`${chainType}-wallet-${index}`}
+                  style={{ color: theme.colors.text, paddingLeft: 10, fontSize: 12 }}
+                >
+                  {wallet.address}
+                </Text>
+              ))
+            ) : (
+              <Text style={{ color: theme.colors.text, opacity: 0.5, paddingLeft: 10, fontSize: 12 }}>
+                No wallets
+              </Text>
+            )}
+          </View>
+        );
+      })}
       {error && <Text style={{ color: "red" }}>{error}</Text>}
     </View>
   );
