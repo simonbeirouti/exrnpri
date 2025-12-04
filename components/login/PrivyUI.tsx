@@ -11,8 +11,8 @@ export default function PrivyUI() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
   const shadows = getThemeShadows(colorScheme);
-
   const { login } = useLogin();
+
   return (
     <View style={styles.container}>
       <TouchableOpacity

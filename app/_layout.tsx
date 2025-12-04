@@ -13,7 +13,7 @@ import {
 } from "@expo-google-fonts/inter";
 import { useFonts } from "expo-font";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import LoginScreen from "@/components/LoginScreen";
+import LoginScreen from "@/components/login/LoginScreen";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isReady } = usePrivy();

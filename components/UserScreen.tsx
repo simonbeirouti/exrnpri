@@ -7,7 +7,7 @@ import {
   getUserEmbeddedEthereumWallet,
   PrivyEmbeddedWalletProvider,
 } from "@privy-io/expo";
-import { ScreenScrollView } from "./ScreenScrollView";
+import { ScreenScrollView } from "./layout/ScreenScrollView";
 import SolanaWalletActions from "./walletActions/SolanaWalletActions";
 import EVMWalletActions from "./walletActions/EVMWalletActions";
 

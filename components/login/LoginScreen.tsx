@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import PrivyUI from "./login/PrivyUI";
+import PrivyUI from "./PrivyUI";
 // import Constants from "expo-constants";
 // import * as Application from "expo-application";
 // import OAuth from "./login/OAuth";
