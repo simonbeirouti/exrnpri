@@ -6,6 +6,7 @@ import { usePrivy } from '@privy-io/expo';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { SettingsActionRow } from '@/components/settings/SettingsActionRow';
 import { ScreenScrollView } from '@/components/layout/ScreenScrollView';
+import { Layout } from '@/constants/Colors';
 
 export default function SettingsScreen() {
     const theme = useTheme();
@@ -49,11 +50,11 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
     content: {
-        padding: 10,
-        gap: 10,
+        padding: Layout.padding,
+        gap: Layout.gap,
     },
     group: {
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     userView: {

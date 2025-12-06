@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Alert, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Alert, TextInput } from 'react-native';
 import { Stack } from 'expo-router';
 import { usePrivy, useLinkWithOAuth, useUnlinkOAuth, useLinkEmail, useLinkSMS } from '@privy-io/expo';
 import { useLinkWithPasskey } from '@privy-io/expo/passkey';
@@ -8,6 +8,8 @@ import { SettingsToggleRow } from '@/components/settings/SettingsToggleRow';
 import { SettingsCollapseRow } from '@/components/settings/SettingsCollapseRow';
 import { useTheme } from '@react-navigation/native';
 import Constants from "expo-constants";
+import { Button } from '@/components/ui/Button';
+import { Colors, Layout } from '@/constants/Colors';
 
 type OAuthProvider = "github" | "google" | "discord" | "apple" | "twitter" | "spotify" | "instagram" | "tiktok" | "linkedin";
 
@@ -25,6 +27,7 @@ const OAUTH_PROVIDERS: { provider: OAuthProvider; label: string; icon: any }[] =
 
 export default function AccountsScreen() {
     const theme = useTheme();
+    const themeColors = Colors[theme.dark ? 'dark' : 'light'];
     const { user } = usePrivy();
     const [expandedEmail, setExpandedEmail] = useState(false);
     const [expandedPhone, setExpandedPhone] = useState(false);
@@ -99,7 +102,7 @@ export default function AccountsScreen() {
                     ]
                 );
             }
-        }
+        };
     };
 
     const linkedEmail = user?.linked_accounts.find((a) => a.type === 'email');
@@ -138,39 +141,39 @@ export default function AccountsScreen() {
                                 <>
                                     <View style={styles.row}>
                                         <TextInput
-                                            style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                                            style={[styles.input, { color: theme.colors.text, borderColor: themeColors.border }]}
                                             placeholder="Enter email"
-                                            placeholderTextColor={theme.colors.text + '80'}
+                                            placeholderTextColor={themeColors.mutedForeground}
                                             value={email}
                                             onChangeText={setEmail}
                                             autoCapitalize="none"
                                             keyboardType="email-address"
                                         />
-                                        <TouchableOpacity
-                                            style={[styles.button, { backgroundColor: theme.colors.primary, opacity: (!email || emailState.status === "sending-code") ? 0.6 : 1 }]}
+                                        <Button
+                                            style={{ width: 80 }}
+                                            title={emailState.status === "sending-code" ? "Sending..." : "Send"}
                                             onPress={() => sendCodeEmail({ email })}
                                             disabled={!email || emailState.status === "sending-code"}
-                                        >
-                                            <Text style={styles.buttonText}>{emailState.status === "sending-code" ? "Sending..." : "Send"}</Text>
-                                        </TouchableOpacity>
+                                            loading={emailState.status === "sending-code"}
+                                        />
                                     </View>
 
                                     <View style={styles.row}>
                                         <TextInput
-                                            style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                                            style={[styles.input, { color: theme.colors.text, borderColor: themeColors.border }]}
                                             placeholder="Verification Code"
-                                            placeholderTextColor={theme.colors.text + '80'}
+                                            placeholderTextColor={themeColors.mutedForeground}
                                             value={emailCode}
                                             onChangeText={setEmailCode}
                                             keyboardType="number-pad"
                                         />
-                                        <TouchableOpacity
-                                            style={[styles.button, { backgroundColor: theme.colors.primary, opacity: (!emailCode || emailState.status === "submitting-code") ? 0.6 : 1 }]}
+                                        <Button
+                                            style={{ width: 80 }}
+                                            title={emailState.status === "submitting-code" ? "Verifying..." : "Link"}
                                             onPress={() => linkWithCodeEmail({ code: emailCode, email })}
                                             disabled={!emailCode || emailState.status === "submitting-code"}
-                                        >
-                                            <Text style={styles.buttonText}>{emailState.status === "submitting-code" ? "Verifying..." : "Link"}</Text>
-                                        </TouchableOpacity>
+                                            loading={emailState.status === "submitting-code"}
+                                        />
                                     </View>
                                 </>
                             )}
@@ -194,38 +197,39 @@ export default function AccountsScreen() {
                                 <>
                                     <View style={styles.row}>
                                         <TextInput
-                                            style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                                            style={[styles.input, { color: theme.colors.text, borderColor: themeColors.border }]}
                                             placeholder="Enter phone number"
-                                            placeholderTextColor={theme.colors.text + '80'}
+                                            placeholderTextColor={themeColors.mutedForeground}
                                             value={phone}
                                             onChangeText={setPhone}
                                             keyboardType="phone-pad"
                                         />
-                                        <TouchableOpacity
-                                            style={[styles.button, { backgroundColor: theme.colors.primary, opacity: (!phone || smsState.status === "sending-code") ? 0.6 : 1 }]}
+                                        <Button
+                                            style={{ width: 80 }}
+                                            title={smsState.status === "sending-code" ? "Sending..." : "Send"}
                                             onPress={() => sendCodeSMS({ phone })}
                                             disabled={!phone || smsState.status === "sending-code"}
-                                        >
-                                            <Text style={styles.buttonText}>{smsState.status === "sending-code" ? "Sending..." : "Send"}</Text>
-                                        </TouchableOpacity>
+                                            loading={smsState.status === "sending-code"}
+                                        />
                                     </View>
 
                                     <View style={styles.row}>
                                         <TextInput
-                                            style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                                            style={[styles.input, { color: theme.colors.text, borderColor: themeColors.border }]}
                                             placeholder="Verification Code"
-                                            placeholderTextColor={theme.colors.text + '80'}
+                                            placeholderTextColor={themeColors.mutedForeground}
                                             value={smsCode}
                                             onChangeText={setSmsCode}
                                             keyboardType="number-pad"
                                         />
-                                        <TouchableOpacity
-                                            style={[styles.button, { backgroundColor: theme.colors.primary, opacity: (!smsCode || smsState.status === "submitting-code") ? 0.6 : 1 }]}
+                                        <Button
+                                            style={{ width: 80 }}
+                                            title={smsState.status === "submitting-code" ? "Verifying..." : "Link"}
                                             onPress={() => linkWithCodeSMS({ code: smsCode, phone })}
                                             disabled={!smsCode || smsState.status === "submitting-code"}
-                                        >
-                                            <Text style={styles.buttonText}>{smsState.status === "submitting-code" ? "Verifying..." : "Link"}</Text>
-                                        </TouchableOpacity>
+                                            loading={smsState.status === "submitting-code"}
+                                        />
+
                                     </View>
                                 </>
                             )}
@@ -266,15 +270,15 @@ export default function AccountsScreen() {
 
 const styles = StyleSheet.create({
     content: {
-        padding: 10,
-        gap: 10,
+        padding: Layout.padding,
+        gap: Layout.gap,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
     },
     group: {
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     inputContainer: {
@@ -288,21 +292,8 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: Layout.borderRadius,
         padding: 12,
         fontSize: 16,
-    },
-    button: {
-        width: 70,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: '600',
-        fontSize: 14,
     },
 });

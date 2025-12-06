@@ -1,8 +1,8 @@
-import { useEmbeddedSolanaWallet } from "@privy-io/expo";
-import { View, Text, Button } from "react-native";
+import { Button } from "../ui/Button";
 import { useState } from "react";
+import { View, Text } from "react-native";
 import { useTheme } from "@react-navigation/native";
-
+import { Layout } from "@/constants/Colors";
 import {
   Connection,
   PublicKey,
@@ -10,10 +10,10 @@ import {
   Transaction,
 } from "@solana/web3.js";
 
-export default function SolanaWalletActions() {
+export default function SolanaWalletActions({ wallet }: { wallet: any }) {
   const theme = useTheme();
-  const { wallets } = useEmbeddedSolanaWallet();
-  const wallet = wallets?.[0];
+  // const { wallets } = useEmbeddedSolanaWallet();
+  // const wallet = wallets?.[0];
   const [result, setResult] = useState<string | null>(null);
 
   const signMessage = async () => {
@@ -97,15 +97,21 @@ export default function SolanaWalletActions() {
     }
   };
   return (
-    <View>
-      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>Solana Wallet Actions</Text>
-      <Button title="Sign Message" onPress={signMessage} />
-      <Button title="Sign Transaction" onPress={signTransaction} />
+    <View style={{ gap: Layout.gap }}>
+      {/* <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>Solana Wallet Actions</Text> */}
+      <Button title="Sign Message" onPress={signMessage} variant="secondary" />
+      <Button title="Sign Transaction" onPress={signTransaction} variant="secondary" />
       <Button
-        title="Sign And Send Transaction"
+        title="Sign & Send Transaction"
         onPress={signAndSendTransaction}
+        variant="primary"
       />
-      {result && <Text style={{ color: theme.colors.text }}>{result}</Text>}
+      {result && (
+        <View style={{ marginTop: 10, padding: 10, backgroundColor: theme.colors.card, borderRadius: 8 }}>
+          <Text style={{ color: theme.colors.text, fontSize: 12 }}>Result:</Text>
+          <Text style={{ color: theme.colors.text, fontFamily: 'Courier' }}>{result}</Text>
+        </View>
+      )}
     </View>
   );
 }

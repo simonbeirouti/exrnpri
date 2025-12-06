@@ -1,86 +1,105 @@
-import React, { useState, useCallback } from "react";
-import { Text, TextInput, View, Button } from "react-native";
+import React, { useState } from "react";
+import { Text, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import {
   usePrivy,
   useEmbeddedEthereumWallet,
-  getUserEmbeddedEthereumWallet,
-  PrivyEmbeddedWalletProvider,
+  useEmbeddedSolanaWallet,
 } from "@privy-io/expo";
 import { ScreenScrollView } from "./layout/ScreenScrollView";
 import SolanaWalletActions from "./walletActions/SolanaWalletActions";
 import EVMWalletActions from "./walletActions/EVMWalletActions";
 
+import { Button } from "./ui/Button";
+import { Dropdown } from "./ui/Dropdown";
+import { ChainSelector } from "./walletActions/ChainSelector";
+import { Layout } from "@/constants/Colors";
+
 export const UserScreen = () => {
-  const [chainId, setChainId] = useState("1");
   const theme = useTheme();
 
-  const { user } = usePrivy();
-  const { wallets } = useEmbeddedEthereumWallet();
-  const account = getUserEmbeddedEthereumWallet(user);
+  // Helper to format address
+  const formatAddress = (address: string) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
-  const switchChain = useCallback(
-    async (provider: PrivyEmbeddedWalletProvider, id: string) => {
-      try {
-        await provider.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: id }],
-        });
-        alert(`Chain switched to ${id} successfully`);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    [account?.address]
-  );
+  const { user } = usePrivy();
+  const { wallets: evmWallets } = useEmbeddedEthereumWallet();
+  const { wallets: solanaWallets } = useEmbeddedSolanaWallet();
+
+  // Set initial selected chain based on what's available or default to ethereum
+  const [selectedChain, setSelectedChain] = useState<string>("ethereum");
+  const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
+
+  const activeWallets = React.useMemo(() => {
+    if (selectedChain === "ethereum") return evmWallets;
+    if (selectedChain === "solana") return solanaWallets;
+
+    // For other chains, fallback to linked_accounts filter
+    return user?.linked_accounts.filter(
+      (a) => a.type === "wallet" && a.chain_type === selectedChain
+    ) || [];
+  }, [selectedChain, evmWallets, solanaWallets, user]);
+
+  const currentWallet = activeWallets?.[selectedWalletIndex];
+
+  // Reset selection when switching chains
+  React.useEffect(() => {
+    setSelectedWalletIndex(0);
+  }, [selectedChain]);
+
+  const walletOptions = activeWallets?.map((w, index) => {
+    const address = (w as any).address || (w as any).publicKey;
+    return {
+      label: `Wallet ${index + 1} (${formatAddress(address)})`,
+      value: index,
+    };
+  }) || [];
 
   return (
     <ScreenScrollView>
       <View
         style={{
-          padding: 20,
+          padding: Layout.padding,
           display: "flex",
           flexDirection: "column",
-          gap: 10,
+          gap: Layout.gap,
         }}
       >
+        <ChainSelector
+          selectedChain={selectedChain}
+          onSelectChain={setSelectedChain}
+        />
 
-        <SolanaWalletActions />
-        <EVMWalletActions />
+        {activeWallets && activeWallets.length > 0 ? (
+          <View>
+            <Text style={{ color: theme.colors.text, marginBottom: 8, fontWeight: '600' }}>Select Wallet</Text>
+            <Dropdown
+              options={walletOptions}
+              selectedValue={selectedWalletIndex}
+              onSelect={setSelectedWalletIndex}
+              disabled={activeWallets.length <= 1}
+            />
+          </View>
+        ) : (
+          <Text style={{ color: theme.colors.text, fontStyle: 'italic', opacity: 0.7 }}>
+            No active wallets for {selectedChain}
+          </Text>
+        )}
 
-        <View>
-          {account?.address && (
-            <>
-              <Text style={{ fontWeight: "bold", color: theme.colors.text }}>Embedded Wallet</Text>
-              <Text style={{ color: theme.colors.text }}>{account?.address}</Text>
-            </>
+        {/* Actions Area */}
+        <View style={{ gap: Layout.gap }}>
+          {selectedChain === "solana" && currentWallet && (
+            <SolanaWalletActions wallet={currentWallet} />
           )}
 
-          <>
-            <Text style={{ color: theme.colors.text }}>Chain ID to set to:</Text>
-            <TextInput
-              value={chainId}
-              onChangeText={setChainId}
-              placeholder="Chain Id"
-              placeholderTextColor={theme.dark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
-              style={{
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-                borderWidth: 1,
-                padding: 8,
-                borderRadius: 4,
-              }}
-            />
-            <Button
-              title="Switch Chain"
-              onPress={async () =>
-                switchChain(await wallets[0].getProvider(), chainId)
-              }
-            />
-          </>
+          {selectedChain === "ethereum" && currentWallet && (
+            <EVMWalletActions wallet={currentWallet} />
+          )}
         </View>
-
       </View>
     </ScreenScrollView>
   );
 };
+

@@ -160,6 +160,15 @@ export const BorderRadius = {
 };
 
 /**
+ * Common layout values
+ */
+export const Layout = {
+  padding: 10,
+  gap: 20,
+  borderRadius: BorderRadius.md,
+};
+
+/**
  * Common font sizes
  */
 export const FontSize = {

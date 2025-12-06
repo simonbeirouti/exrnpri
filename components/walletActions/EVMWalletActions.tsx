@@ -1,24 +1,27 @@
-import { useEmbeddedEthereumWallet } from "@privy-io/expo";
+import { Button } from "../ui/Button";
 import { useState } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text } from "react-native";
 import { useTheme } from "@react-navigation/native";
+import { Layout } from "@/constants/Colors";
 
-export default function EVMWalletActions() {
+export default function EVMWalletActions({ wallet }: { wallet: any }) {
   const theme = useTheme();
   const [result, setResult] = useState<string | null>(null);
-  const { wallets } = useEmbeddedEthereumWallet();
-  const wallet = wallets?.[0];
 
   const signMessage = async () => {
     const provider = await wallet?.getProvider?.();
     if (!provider) return;
 
     const message = "Hello World";
-    const signature = await provider.request({
-      method: "personal_sign",
-      params: [message, wallet?.address],
-    });
-    setResult(signature);
+    try {
+      const signature = await provider.request({
+        method: "personal_sign",
+        params: [message, wallet?.address],
+      });
+      setResult(signature);
+    } catch (e: any) {
+      setResult(e.message ?? String(e));
+    }
   };
   const signTransaction = async () => {
     const provider = await wallet?.getProvider?.();
@@ -37,35 +40,45 @@ export default function EVMWalletActions() {
         ],
       });
       setResult(signature);
-    } catch (error) {
-      setResult(JSON.stringify(error));
+    } catch (error: any) {
+      setResult(error.message || JSON.stringify(error));
     }
   };
   const signAndSendTransaction = async () => {
     const provider = await wallet?.getProvider?.();
     if (!provider) return;
-    const response = await provider.request({
-      method: "eth_sendTransaction",
-      params: [
-        {
-          from: wallet.address,
-          to: "0x0000000000000000000000000000000000000000",
-          value: "1",
-        },
-      ],
-    });
-    setResult(JSON.stringify(response));
+    try {
+      const response = await provider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from: wallet.address,
+            to: "0x0000000000000000000000000000000000000000",
+            value: "1",
+          },
+        ],
+      });
+      setResult(JSON.stringify(response));
+    } catch (error: any) {
+      setResult(error.message || JSON.stringify(error));
+    }
   };
   return (
-    <View>
-      <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>EVM Wallet Actions</Text>
-      <Button title="Sign Message" onPress={signMessage} />
-      <Button title="Sign Transaction" onPress={signTransaction} />
+    <View style={{ gap: Layout.gap }}>
+      {/* <Text style={{ color: theme.colors.text, fontWeight: "bold" }}>EVM Wallet Actions</Text> */}
+      <Button title="Sign Message" onPress={signMessage} variant="secondary" />
+      <Button title="Sign Transaction" onPress={signTransaction} variant="secondary" />
       <Button
-        title="Sign And Send Transaction"
+        title="Sign & Send Transaction"
         onPress={signAndSendTransaction}
+        variant="primary"
       />
-      {result && <Text style={{ color: theme.colors.text }}>{result}</Text>}
+      {result && (
+        <View style={{ marginTop: 10, padding: 10, backgroundColor: theme.colors.card, borderRadius: 8 }}>
+          <Text style={{ color: theme.colors.text, fontSize: 12 }}>Result:</Text>
+          <Text style={{ color: theme.colors.text, fontFamily: 'Courier' }}>{result}</Text>
+        </View>
+      )}
     </View>
   );
 }

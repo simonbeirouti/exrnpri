@@ -5,13 +5,15 @@ import {
     usePrivy,
 } from "@privy-io/expo";
 import { useCreateWallet } from "@privy-io/expo/extended-chains";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTheme } from "@react-navigation/native";
 import { SettingsCollapseRow } from "@/components/settings/SettingsCollapseRow";
 import { Stack } from 'expo-router';
 import { ScreenScrollView } from '@/components/layout/ScreenScrollView';
+import { Button } from '@/components/ui/Button';
+import { Layout } from '@/constants/Colors';
 
 export default function WalletsScreen() {
     const theme = useTheme();
@@ -106,12 +108,10 @@ export default function WalletsScreen() {
                                         </Text>
                                     )}
 
-                                    <TouchableOpacity
-                                        style={[styles.createButton, { backgroundColor: theme.colors.primary }]}
+                                    <Button
+                                        title="Create Wallet"
                                         onPress={() => createWallets(chain.type)}
-                                    >
-                                        <Text style={styles.createButtonText}>Create Wallet</Text>
-                                    </TouchableOpacity>
+                                    />
                                 </View>
                             </SettingsCollapseRow>
                         );
@@ -125,11 +125,11 @@ export default function WalletsScreen() {
 
 const styles = StyleSheet.create({
     content: {
-        padding: 10,
-        gap: 10,
+        padding: Layout.padding,
+        gap: Layout.gap,
     },
     container: {
-        borderRadius: 10,
+        borderRadius: Layout.borderRadius,
         overflow: 'hidden',
     },
     expandedContent: {
@@ -142,16 +142,5 @@ const styles = StyleSheet.create({
     noWalletsText: {
         opacity: 0.6,
         fontStyle: 'italic',
-    },
-    createButton: {
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    createButtonText: {
-        color: 'white',
-        fontWeight: '600',
-        fontSize: 14,
     },
 });
