@@ -15,7 +15,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.besimon.privy",
+      "bundleIdentifier": "com.u.privy",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -31,11 +31,11 @@
       "package": "com.besimon.privy"
     },
     "extra": {
-      "privyAppId": "cmiolyvvx04pylb0cgggelpwy",
+      "privyAppId": "cmi...lpwy",
       "privyClientId": "client-WY6TNxZccF9nZw9GgyJeBcwqDoAPCEkFSuky57EgiqmW7",
       "router": {},
       "eas": {
-        "projectId": "f58c5220-2b00-49a8-855f-c66a087146d6"
+        "projectId": ""
       }
     },
     "plugins": [
