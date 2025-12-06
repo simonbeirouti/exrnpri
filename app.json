@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "@privy-io/expo-starter",
-    "slug": "privy",
+    "name": "exrnpri",
+    "slug": "exrnpri",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "privymv",
+    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -28,11 +28,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.besimon.privy"
+      "package": "com.u.privy"
     },
     "extra": {
       "privyAppId": "cmi...lpwy",
-      "privyClientId": "client-WY6TNxZccF9nZw9GgyJeBcwqDoAPCEkFSuky57EgiqmW7",
+      "privyClientId": "client-...",
       "router": {},
       "eas": {
         "projectId": ""
