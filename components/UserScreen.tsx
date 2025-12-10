@@ -14,40 +14,28 @@ import { Button } from "./ui/Button";
 import { Dropdown } from "./ui/Dropdown";
 import { ChainSelector } from "./walletActions/ChainSelector";
 import { Layout } from "@/constants/Colors";
+import { useWallet } from "@/context/WalletContext";
 
 export const UserScreen = () => {
   const theme = useTheme();
+
+  const { user } = usePrivy();
+
+  // Use global wallet context
+  const {
+    selectedChain,
+    setSelectedChain,
+    selectedWalletIndex,
+    setSelectedWalletIndex,
+    activeWallets,
+    currentWallet,
+  } = useWallet();
 
   // Helper to format address
   const formatAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
-
-  const { user } = usePrivy();
-  const { wallets: evmWallets } = useEmbeddedEthereumWallet();
-  const { wallets: solanaWallets } = useEmbeddedSolanaWallet();
-
-  // Set initial selected chain based on what's available or default to ethereum
-  const [selectedChain, setSelectedChain] = useState<string>("ethereum");
-  const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
-
-  const activeWallets = React.useMemo(() => {
-    if (selectedChain === "ethereum") return evmWallets;
-    if (selectedChain === "solana") return solanaWallets;
-
-    // For other chains, fallback to linked_accounts filter
-    return user?.linked_accounts.filter(
-      (a) => a.type === "wallet" && a.chain_type === selectedChain
-    ) || [];
-  }, [selectedChain, evmWallets, solanaWallets, user]);
-
-  const currentWallet = activeWallets?.[selectedWalletIndex];
-
-  // Reset selection when switching chains
-  React.useEffect(() => {
-    setSelectedWalletIndex(0);
-  }, [selectedChain]);
 
   const walletOptions = activeWallets?.map((w, index) => {
     const address = (w as any).address || (w as any).publicKey;

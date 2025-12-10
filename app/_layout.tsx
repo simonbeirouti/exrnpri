@@ -15,6 +15,8 @@ import { useFonts } from "expo-font";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import LoginScreen from "@/components/login/LoginScreen";
 
+import { WalletProvider } from "@/context/WalletContext";
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isReady } = usePrivy();
   const theme = useTheme();
@@ -50,9 +52,11 @@ export default function RootLayout() {
     >
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <AuthGuard>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
+          <WalletProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </WalletProvider>
         </AuthGuard>
         <StatusBar style="auto" />
       </ThemeProvider>

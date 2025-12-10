@@ -5,7 +5,8 @@ import {
     usePrivy,
 } from "@privy-io/expo";
 import { useCreateWallet } from "@privy-io/expo/extended-chains";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTheme } from "@react-navigation/native";
@@ -96,11 +97,17 @@ export default function WalletsScreen() {
                                 <View style={styles.expandedContent}>
                                     {chainWallets.length > 0 ? (
                                         chainWallets.map((wallet, index) => (
-                                            <View key={`${chain.type}-wallet-${index}`}>
+                                            <TouchableOpacity
+                                                key={`${chain.type}-wallet-${index}`}
+                                                onPress={async () => {
+                                                    await Clipboard.setStringAsync(wallet.address);
+                                                    Alert.alert("Copied", "Wallet address copied to clipboard.");
+                                                }}
+                                            >
                                                 <Text style={[styles.walletAddress, { color: theme.colors.text }]}>
                                                     {wallet.address}
                                                 </Text>
-                                            </View>
+                                            </TouchableOpacity>
                                         ))
                                     ) : (
                                         <Text style={[styles.noWalletsText, { color: theme.colors.text }]}>
