@@ -136,6 +136,8 @@ export function CreateBadgeForm({ visible, onClose, onSuccess }: CreateBadgeForm
                 new Program(badgePlatformIdl as any, new AnchorProvider(connection, solanaWallet as any, {})),
                 creator,
                 formData.badgeId,
+                formData.name,
+                formData.description,
                 metadataUri,
                 parseFloat(formData.price)
             );
@@ -288,11 +290,6 @@ export function CreateBadgeForm({ visible, onClose, onSuccess }: CreateBadgeForm
                                 />
                             </View>
 
-                            {/* Hidden Badge ID Display (Optional, for verification) */}
-                            <Text style={[styles.hint, { textAlign: 'center', marginBottom: Layout.gap, color: theme.colors.text + '66' }]}>
-                                ID: {formData.badgeId}
-                            </Text>
-
                             {/* Create Button */}
                             <View style={styles.buttonContainer}>
                                 <Button
@@ -345,7 +342,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     fieldContainer: {
-        marginBottom: Layout.gap,
+        // Removed marginBottom for tighter spacing
     },
     label: {
         fontSize: FontSize.md,
@@ -367,7 +364,6 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     buttonContainer: {
-        marginTop: Layout.gap,
         alignItems: 'center',
     },
 });

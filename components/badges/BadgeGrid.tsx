@@ -8,6 +8,7 @@ import { Spacing, FontSize } from '@/constants/Colors';
 interface BadgeGridProps {
     badges: BadgeWithMetadata[];
     onBadgePress?: (badge: BadgeWithMetadata) => void;
+    onTogglePause?: (badge: BadgeWithMetadata) => void;
     onRefresh?: () => void;
     refreshing?: boolean;
     showPurchaseButton?: boolean;
@@ -16,11 +17,13 @@ interface BadgeGridProps {
     showPrice?: boolean;
     enableBurn?: boolean;
     onBurn?: (badge: BadgeWithMetadata) => void;
+    creatorWallet?: string;
 }
 
 export function BadgeGrid({
     badges,
     onBadgePress,
+    onTogglePause,
     onRefresh,
     refreshing = false,
     showPurchaseButton = false,
@@ -28,23 +31,32 @@ export function BadgeGrid({
     emptyMessage = 'No badges found',
     showPrice,
     enableBurn = false,
-    onBurn
+    onBurn,
+    creatorWallet
 }: BadgeGridProps) {
     const theme = useTheme();
 
-    const renderBadge = ({ item }: { item: BadgeWithMetadata }) => (
-        <View style={styles.gridItem}>
-            <BadgeCard
-                badge={item}
-                onPress={() => onBadgePress?.(item)}
-                showPurchaseButton={showPurchaseButton}
-                showOwnedIndicator={showOwnedIndicator}
-                showPrice={showPrice}
-                enableBurn={enableBurn}
-                onBurn={onBurn}
-            />
-        </View>
-    );
+    const renderBadge = ({ item }: { item: BadgeWithMetadata }) => {
+        const isCreator = creatorWallet && item.creator.toString() === creatorWallet;
+        const isLegacyBadge = item.description === 'Legacy Badge';
+
+        return (
+            <View style={styles.gridItem}>
+                <BadgeCard
+                    badge={item}
+                    onPress={() => onBadgePress?.(item)}
+                    onTogglePause={isCreator && !isLegacyBadge ? () => onTogglePause?.(item) : undefined}
+                    showPurchaseButton={showPurchaseButton}
+                    showOwnedIndicator={showOwnedIndicator}
+                    showPrice={showPrice}
+                    enableBurn={enableBurn}
+                    onBurn={onBurn}
+                    showPauseButton={!!isCreator && !isLegacyBadge}
+                    isCreator={!!isCreator}
+                />
+            </View>
+        );
+    };
 
     const renderEmpty = () => (
         <View style={styles.emptyContainer}>

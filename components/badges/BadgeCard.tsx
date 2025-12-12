@@ -10,21 +10,27 @@ import { Button } from '../ui/Button';
 interface BadgeCardProps {
     badge: BadgeWithMetadata;
     onPress?: () => void;
+    onTogglePause?: () => void;
     showPurchaseButton?: boolean;
     showOwnedIndicator?: boolean;
     showPrice?: boolean;
     enableBurn?: boolean;
     onBurn?: (badge: BadgeWithMetadata) => void;
+    showPauseButton?: boolean;
+    isCreator?: boolean;
 }
 
 export function BadgeCard({
     badge,
     onPress,
+    onTogglePause,
     showPurchaseButton = false,
     showOwnedIndicator = false,
     showPrice = true,
     enableBurn = false,
-    onBurn
+    onBurn,
+    showPauseButton = false,
+    isCreator = false
 }: BadgeCardProps) {
     const theme = useTheme();
     const priceInSol = lamportsToSol(badge.price);
@@ -65,6 +71,20 @@ export function BadgeCard({
     };
 
     const handlePress = () => {
+        console.log('\n=== BADGE CARD CLICKED ===');
+        console.log('Badge Data:', JSON.stringify({
+            name: badge.name,
+            badgeId: badge.badgeId,
+            description: badge.description,
+            creator: badge.creator.toString(),
+            price: badge.price.toString(),
+            mint: badge.mint.toString(),
+            uri: badge.uri,
+            isActive: badge.isActive,
+            isOwned: badge.isOwned,
+            bump: badge.bump,
+        }, null, 2));
+        console.log('=== END BADGE CARD DATA ===\n');
         openModal();
     };
 
@@ -85,7 +105,14 @@ export function BadgeCard({
         <>
             {/* Thumbnail View (Grid Item) */}
             <Pressable onPress={handlePress} style={styles.thumbnailContainer}>
-                <View style={[styles.thumbnail, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+                <View style={[
+                    styles.thumbnail,
+                    {
+                        backgroundColor: theme.colors.card,
+                        borderColor: isCreator ? theme.colors.primary : theme.colors.border,
+                        borderWidth: isCreator ? 2 : 1
+                    }
+                ]}>
                     {badge.image ? (
                         <Image
                             source={{ uri: badge.image }}
@@ -95,6 +122,24 @@ export function BadgeCard({
                     ) : (
                         <View style={[styles.imagePlaceholder, { backgroundColor: theme.colors.primary }]}>
                             <Ionicons name="ribbon" size={32} color="#fff" />
+                        </View>
+                    )}
+
+                    {/* Creator Badge Indicator */}
+                    {isCreator && (
+                        <View style={styles.creatorBadge}>
+                            <Ionicons name="person" size={12} color="#fff" />
+                            <Text style={styles.creatorText}>Creator</Text>
+                        </View>
+                    )}
+
+                    {/* Paused Status Indicator */}
+                    {!badge.isActive && (
+                        <View style={styles.pausedOverlay}>
+                            <View style={styles.pausedBadge}>
+                                <Ionicons name="pause-circle" size={16} color="#fff" />
+                                <Text style={styles.pausedText}>Paused</Text>
+                            </View>
                         </View>
                     )}
                 </View>
@@ -195,6 +240,22 @@ export function BadgeCard({
                                         variant="primary"
                                         size="lg"
                                         style={{ marginTop: Spacing.sm, width: '100%' }}
+                                    />
+                                )}
+
+                                {showPauseButton && onTogglePause && (
+                                    <Button
+                                        title={badge.isActive ? '⏸ Pause Badge' : '▶ Unpause Badge'}
+                                        onPress={onTogglePause}
+                                        variant="outline"
+                                        size="md"
+                                        style={{
+                                            marginTop: Spacing.sm,
+                                            width: '100%',
+                                            borderColor: badge.isActive ? '#FF9500' : '#34C759',
+                                            borderWidth: 1
+                                        }}
+                                        textStyle={{ color: badge.isActive ? '#FF9500' : '#34C759' }}
                                     />
                                 )}
 
@@ -329,5 +390,42 @@ const styles = StyleSheet.create({
         top: Spacing.sm,
         right: Spacing.sm,
         zIndex: 10,
+    },
+    pausedOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    pausedBadge: {
+        backgroundColor: '#FF9500',
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: 4,
+        borderRadius: BorderRadius.md,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    pausedText: {
+        color: '#fff',
+        fontSize: FontSize.xs,
+        fontWeight: '600',
+    },
+    creatorBadge: {
+        position: 'absolute',
+        top: Spacing.sm,
+        left: Spacing.sm,
+        backgroundColor: 'rgba(0, 122, 255, 0.9)',
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: 4,
+        borderRadius: BorderRadius.md,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    creatorText: {
+        color: '#fff',
+        fontSize: FontSize.xs,
+        fontWeight: '600',
     },
 });

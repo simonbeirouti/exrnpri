@@ -147,6 +147,54 @@ export type BadgePlatform = {
       "args": []
     },
     {
+      "name": "deactivateBadge",
+      "discriminator": [
+        127,
+        209,
+        207,
+        209,
+        5,
+        144,
+        73,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "badge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "badge.badge_id",
+                "account": "badge"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initializeBadge",
       "discriminator": [
         96,
@@ -222,6 +270,14 @@ export type BadgePlatform = {
       "args": [
         {
           "name": "badgeId",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
           "type": "string"
         },
         {
@@ -380,6 +436,54 @@ export type BadgePlatform = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "reactivateBadge",
+      "discriminator": [
+        205,
+        233,
+        92,
+        253,
+        27,
+        218,
+        18,
+        56
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "badge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "badge.badge_id",
+                "account": "badge"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -400,8 +504,8 @@ export type BadgePlatform = {
   "errors": [
     {
       "code": 6000,
-      "name": "invalidTokenAmount",
-      "msg": "Invalid token amount - must own exactly 1 badge"
+      "name": "unauthorized",
+      "msg": "Only the badge creator can deactivate this badge"
     }
   ],
   "types": [
@@ -427,8 +531,20 @@ export type BadgePlatform = {
             "type": "string"
           },
           {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "uri",
             "type": "string"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
           },
           {
             "name": "bump",

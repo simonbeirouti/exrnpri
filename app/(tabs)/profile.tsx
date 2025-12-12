@@ -34,27 +34,80 @@ export default function ProfilePage() {
             // 1. Fetch user's token accounts
             const ownedMints = await getOwnedBadgeMints(connection, owner);
 
-            // 2. Fetch all badge accounts from program
+            // 2. Fetch all badge accounts from program manually
             const provider = new AnchorProvider(connection, solanaWallet as any, {});
             const program = new Program<BadgePlatform>(badgePlatformIdl as BadgePlatform, provider);
 
-            const badgeAccounts = await program.account.badge.all();
+            const accounts = await connection.getProgramAccounts(program.programId);
 
-            // 3. Filter and Map
-            const ownedBadgesData: BadgeWithMetadata[] = badgeAccounts
-                .filter(account => ownedMints.has(account.account.mint.toString()))
-                .map((account) => ({
-                    creator: account.account.creator,
-                    price: account.account.price,
-                    mint: account.account.mint,
-                    badgeId: account.account.badgeId,
-                    uri: account.account.uri,
-                    bump: account.account.bump,
-                    name: account.account.badgeId,
-                    description: 'Owned Verified Badge',
-                    image: account.account.uri,
-                    isOwned: true,
-                }));
+            // 3. Manually deserialize and filter owned badges
+            const ownedBadgesData: BadgeWithMetadata[] = [];
+            for (const { account, pubkey } of accounts) {
+                try {
+                    const decoded = program.coder.accounts.decode('badge', account.data);
+
+                    // Only include if user owns this badge
+                    if (ownedMints.has(decoded.mint.toString())) {
+                        ownedBadgesData.push({
+                            creator: decoded.creator,
+                            price: decoded.price,
+                            mint: decoded.mint,
+                            badgeId: decoded.badgeId,
+                            name: decoded.name,
+                            description: decoded.description,
+                            uri: decoded.uri,
+                            bump: decoded.bump,
+                            image: decoded.uri,
+                            isOwned: true,
+                        });
+                    }
+                } catch (err) {
+                    // Try to decode as old schema (without name and description)
+                    try {
+                        const data = account.data;
+                        let offset = 8; // Skip discriminator
+
+                        const creator = new PublicKey(data.slice(offset, offset + 32));
+                        offset += 32;
+
+                        const price = data.readBigUInt64LE(offset);
+                        offset += 8;
+
+                        const mint = new PublicKey(data.slice(offset, offset + 32));
+                        offset += 32;
+
+                        const badgeIdLen = data.readUInt32LE(offset);
+                        offset += 4;
+                        const badgeId = data.slice(offset, offset + badgeIdLen).toString('utf8');
+                        offset += badgeIdLen;
+
+                        const uriLen = data.readUInt32LE(offset);
+                        offset += 4;
+                        const uri = data.slice(offset, offset + uriLen).toString('utf8');
+                        offset += uriLen;
+
+                        const bump = data.readUInt8(offset);
+
+                        // Only include if user owns this badge
+                        if (ownedMints.has(mint.toString())) {
+                            ownedBadgesData.push({
+                                creator,
+                                price,
+                                mint,
+                                badgeId,
+                                name: badgeId, // Use badgeId as fallback name
+                                description: 'Legacy Badge', // Default description
+                                uri,
+                                bump,
+                                image: uri,
+                                isOwned: true,
+                            });
+                        }
+                    } catch (legacyErr) {
+                        console.warn(`Failed to decode badge account ${pubkey.toString()} as both new and legacy schema:`, legacyErr);
+                    }
+                }
+            }
 
             setOwnedBadges(ownedBadgesData);
         } catch (error) {

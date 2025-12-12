@@ -93,6 +93,8 @@ export async function createInitializeBadgeInstruction(
     program: Program<BadgePlatform>,
     creator: PublicKey,
     badgeId: string,
+    name: string,
+    description: string,
     uri: string,
     priceInSol: number
 ): Promise<TransactionInstruction> {
@@ -102,7 +104,7 @@ export async function createInitializeBadgeInstruction(
     const priceInLamports = solToLamports(priceInSol);
 
     return await program.methods
-        .initializeBadge(badgeId, uri, priceInLamports)
+        .initializeBadge(badgeId, name, description, uri, priceInLamports)
         .accounts({
             creator,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
@@ -177,6 +179,44 @@ export function lamportsToSol(lamports: bigint | BN): number {
         ? Number(lamports)
         : lamports.toNumber();
     return lamportsNum / LAMPORTS_PER_SOL;
+}
+
+/**
+ * Create deactivate badge instruction (sets isActive to false)
+ */
+export async function createDeactivateBadgeInstruction(
+    program: Program<BadgePlatform>,
+    creator: PublicKey,
+    badgeId: string
+): Promise<TransactionInstruction> {
+    const [badgePDA] = getBadgePDA(creator, badgeId);
+
+    return await program.methods
+        .deactivateBadge()
+        .accountsPartial({
+            creator,
+            badge: badgePDA,
+        })
+        .instruction();
+}
+
+/**
+ * Create reactivate badge instruction (sets isActive to true)
+ */
+export async function createReactivateBadgeInstruction(
+    program: Program<BadgePlatform>,
+    creator: PublicKey,
+    badgeId: string
+): Promise<TransactionInstruction> {
+    const [badgePDA] = getBadgePDA(creator, badgeId);
+
+    return await program.methods
+        .reactivateBadge()
+        .accountsPartial({
+            creator,
+            badge: badgePDA,
+        })
+        .instruction();
 }
 
 /**

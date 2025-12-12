@@ -8,7 +8,10 @@ export interface BadgeMetadata {
     price: bigint;
     mint: PublicKey;
     badgeId: string;
+    name: string;
+    description: string;
     uri: string;
+    isActive: boolean;
     bump: number;
 }
 
@@ -17,8 +20,6 @@ export interface BadgeMetadata {
  */
 export interface BadgeWithMetadata extends BadgeMetadata {
     // Parsed metadata from URI (future enhancement)
-    name?: string;
-    description?: string;
     image?: string;
     // UI state
     isOwned?: boolean;

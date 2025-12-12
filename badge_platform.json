@@ -141,6 +141,54 @@
       "args": []
     },
     {
+      "name": "deactivate_badge",
+      "discriminator": [
+        127,
+        209,
+        207,
+        209,
+        5,
+        144,
+        73,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "badge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "badge.badge_id",
+                "account": "Badge"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize_badge",
       "discriminator": [
         96,
@@ -216,6 +264,14 @@
       "args": [
         {
           "name": "badge_id",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
           "type": "string"
         },
         {
@@ -374,6 +430,54 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "reactivate_badge",
+      "discriminator": [
+        205,
+        233,
+        92,
+        253,
+        27,
+        218,
+        18,
+        56
+      ],
+      "accounts": [
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "badge",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  100,
+                  103,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "account",
+                "path": "badge.badge_id",
+                "account": "Badge"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -394,8 +498,8 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidTokenAmount",
-      "msg": "Invalid token amount - must own exactly 1 badge"
+      "name": "Unauthorized",
+      "msg": "Only the badge creator can deactivate this badge"
     }
   ],
   "types": [
@@ -421,8 +525,20 @@
             "type": "string"
           },
           {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
             "name": "uri",
             "type": "string"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
           },
           {
             "name": "bump",
