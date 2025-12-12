@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import { PublicKey, Transaction } from '@solana/web3.js';
@@ -8,59 +8,67 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { BadgeGrid } from '@/components/badges/BadgeGrid';
 import { SolanaNetworkWarning } from '@/components/badges/SolanaNetworkWarning';
 import { BadgeWithMetadata } from '@/utils/badge_types';
-import { getConnection, createBurnBadgeInstruction, getOwnedBadgeMints } from '@/utils/badge_client';
+import { getConnection, createBurnBadgeInstruction, getOwnedBadgeMints, BADGE_PROGRAM_ID } from '@/utils/badge_client';
 import { FontSize, Spacing, Layout } from '@/constants/Colors';
 import { useWallet } from '@/context/WalletContext';
 import { useBadgeContext } from '@/context/BadgeContext';
 import { BadgePlatform } from '@/utils/badge_platform';
 import badgePlatformIdl from '@/badge_platform.json';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfilePage() {
     const theme = useTheme();
     const { currentWallet, selectedChain } = useWallet();
     const { profileRefreshVersion } = useBadgeContext();
     const solanaWallet = currentWallet;
-    const [ownedBadges, setOwnedBadges] = useState<BadgeWithMetadata[]>([]);
+    const [badges, setBadges] = useState<BadgeWithMetadata[]>([]);
     const [loading, setLoading] = useState(false);
+    const [filter, setFilter] = useState<'all' | 'live' | 'paused'>('all');
 
     const fetchOwnedBadges = async () => {
-        if (selectedChain !== 'solana' || !solanaWallet?.address) return;
+        if (selectedChain !== 'solana') return;
 
         setLoading(true);
         try {
             const connection = getConnection();
-            const owner = new PublicKey(solanaWallet.address);
-
-            // 1. Fetch user's token accounts
-            const ownedMints = await getOwnedBadgeMints(connection, owner);
-
-            // 2. Fetch all badge accounts from program manually
             const provider = new AnchorProvider(connection, solanaWallet as any, {});
             const program = new Program<BadgePlatform>(badgePlatformIdl as BadgePlatform, provider);
 
-            const accounts = await connection.getProgramAccounts(program.programId);
+            // Fetch all badge accounts from program
+            const accounts = await connection.getProgramAccounts(BADGE_PROGRAM_ID);
+            console.log(`\nFetched ${accounts.length} badge accounts from blockchain`);
 
-            // 3. Manually deserialize and filter owned badges
-            const ownedBadgesData: BadgeWithMetadata[] = [];
+            // Fetch owned mints if connected
+            let ownedMints = new Set<string>();
+            if (solanaWallet?.address) {
+                ownedMints = await getOwnedBadgeMints(
+                    connection,
+                    new PublicKey(solanaWallet.address)
+                );
+            }
+
+            // Manually deserialize each account, using fallback for old badges
+            const badgesData: BadgeWithMetadata[] = [];
             for (const { account, pubkey } of accounts) {
                 try {
+                    // Try to decode with new schema (includes name and description)
                     const decoded = program.coder.accounts.decode('badge', account.data);
 
-                    // Only include if user owns this badge
-                    if (ownedMints.has(decoded.mint.toString())) {
-                        ownedBadgesData.push({
-                            creator: decoded.creator,
-                            price: decoded.price,
-                            mint: decoded.mint,
-                            badgeId: decoded.badgeId,
-                            name: decoded.name,
-                            description: decoded.description,
-                            uri: decoded.uri,
-                            bump: decoded.bump,
-                            image: decoded.uri,
-                            isOwned: true,
-                        });
-                    }
+                    console.log(`Badge ${decoded.badgeId}: isActive = ${decoded.isActive}`);
+
+                    badgesData.push({
+                        creator: decoded.creator,
+                        price: decoded.price,
+                        mint: decoded.mint,
+                        badgeId: decoded.badgeId,
+                        name: decoded.name,
+                        description: decoded.description,
+                        uri: decoded.uri,
+                        isActive: decoded.isActive ?? true,
+                        bump: decoded.bump,
+                        image: decoded.uri,
+                        isOwned: ownedMints.has(decoded.mint.toString()),
+                    });
                 } catch (err) {
                     // Try to decode as old schema (without name and description)
                     try {
@@ -88,30 +96,32 @@ export default function ProfilePage() {
 
                         const bump = data.readUInt8(offset);
 
-                        // Only include if user owns this badge
-                        if (ownedMints.has(mint.toString())) {
-                            ownedBadgesData.push({
-                                creator,
-                                price,
-                                mint,
-                                badgeId,
-                                name: badgeId, // Use badgeId as fallback name
-                                description: 'Legacy Badge', // Default description
-                                uri,
-                                bump,
-                                image: uri,
-                                isOwned: true,
-                            });
-                        }
+                        console.log(`Legacy Badge ${badgeId}: defaulting isActive to true`);
+
+                        badgesData.push({
+                            creator,
+                            price,
+                            mint,
+                            badgeId,
+                            name: badgeId, // Use badgeId as fallback name
+                            description: 'Legacy Badge', // Default description
+                            uri,
+                            isActive: true, // Legacy badges default to active
+                            bump,
+                            image: uri,
+                            isOwned: ownedMints.has(mint.toString()),
+                        });
                     } catch (legacyErr) {
                         console.warn(`Failed to decode badge account ${pubkey.toString()} as both new and legacy schema:`, legacyErr);
                     }
                 }
             }
 
-            setOwnedBadges(ownedBadgesData);
+            console.log(`Total badges loaded: ${badgesData.length}\n`);
+            // Show all badges with owned indicators
+            setBadges(badgesData);
         } catch (error) {
-            console.error('Error fetching owned badges:', error);
+            console.error('Error fetching badges:', error);
         } finally {
             setLoading(false);
         }
@@ -160,7 +170,7 @@ export default function ProfilePage() {
             Alert.alert('Success', 'Badge burned successfully!');
 
             // Optimistically remove badge from UI
-            setOwnedBadges(current => current.filter(b => b.mint.toString() !== badge.mint.toString()));
+            setBadges((current: BadgeWithMetadata[]) => current.filter((b: BadgeWithMetadata) => b.mint.toString() !== badge.mint.toString()));
 
             await fetchOwnedBadges(); // Refresh list to confirm
         } catch (error) {
@@ -175,21 +185,56 @@ export default function ProfilePage() {
         fetchOwnedBadges();
     }, [solanaWallet?.address, selectedChain, profileRefreshVersion]);
 
+    // Filter badges based on selected filter
+    const filteredBadges = badges.filter(badge => {
+        if (filter === 'live') return badge.isActive;
+        if (filter === 'paused') return !badge.isActive;
+        return true; // 'all'
+    });
+
+    const cycleFilter = () => {
+        setFilter(current => {
+            if (current === 'all') return 'live';
+            if (current === 'live') return 'paused';
+            return 'all';
+        });
+    };
+
+    const getFilterIcon = () => {
+        if (filter === 'all') return 'apps';
+        if (filter === 'live') return 'play-circle';
+        return 'pause-circle';
+    };
+
+    const getFilterColor = () => {
+        if (filter === 'all') return theme.colors.text;
+        if (filter === 'live') return '#34C759';
+        return '#FF9500';
+    };
+
     return (
         <SafeAreaView style={{ flex: 1 }} edges={['top']}>
             {/* Owned Badges Grid */}
             <View style={styles.badgesSection}>
                 <SolanaNetworkWarning>
-                    <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                        My Badges
-                    </Text>
+                    <View style={styles.header}>
+                        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                            My Badges
+                        </Text>
+                        <TouchableOpacity
+                            onPress={cycleFilter}
+                            style={styles.filterButton}
+                        >
+                            <Ionicons name={getFilterIcon()} size={28} color={getFilterColor()} />
+                        </TouchableOpacity>
+                    </View>
 
                     <BadgeGrid
-                        badges={ownedBadges}
+                        badges={filteredBadges}
                         onRefresh={handleRefresh}
                         refreshing={loading}
                         showOwnedIndicator={true}
-                        emptyMessage="You don't own any badges yet. Browse and purchase your first badge!"
+                        emptyMessage="No badges match the current filter."
                         showPrice={false}
                         enableBurn={true}
                         onBurn={handleBurn}
@@ -202,9 +247,10 @@ export default function ProfilePage() {
 
 const styles = StyleSheet.create({
     header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         padding: Layout.padding,
-        borderBottomWidth: 1,
-        borderBottomColor: '#00000011',
     },
     profileInfo: {
         flexDirection: 'row',
@@ -257,6 +303,8 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: FontSize.xxl,
         fontWeight: '700',
-        padding: Layout.padding,
+    },
+    filterButton: {
+        padding: 4,
     },
 });
