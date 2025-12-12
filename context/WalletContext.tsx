@@ -17,7 +17,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const { wallets: evmWallets } = useEmbeddedEthereumWallet();
     const { wallets: solanaWallets } = useEmbeddedSolanaWallet();
 
-    const [selectedChain, setSelectedChain] = useState<string>("ethereum");
+    const [selectedChain, setSelectedChain] = useState<string>("solana");
     const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
 
     const activeWallets = useMemo(() => {

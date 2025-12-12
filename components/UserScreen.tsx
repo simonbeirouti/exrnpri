@@ -1,16 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Text, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import {
-  usePrivy,
-  useEmbeddedEthereumWallet,
-  useEmbeddedSolanaWallet,
-} from "@privy-io/expo";
 import { ScreenScrollView } from "./layout/ScreenScrollView";
-import SolanaWalletActions from "./walletActions/SolanaWalletActions";
-import EVMWalletActions from "./walletActions/EVMWalletActions";
 
-import { Button } from "./ui/Button";
 import { Dropdown } from "./ui/Dropdown";
 import { ChainSelector } from "./walletActions/ChainSelector";
 import { Layout } from "@/constants/Colors";
@@ -18,8 +10,6 @@ import { useWallet } from "@/context/WalletContext";
 
 export const UserScreen = () => {
   const theme = useTheme();
-
-  const { user } = usePrivy();
 
   // Use global wallet context
   const {
@@ -76,16 +66,6 @@ export const UserScreen = () => {
           </Text>
         )}
 
-        {/* Actions Area */}
-        <View style={{ gap: Layout.gap }}>
-          {selectedChain === "solana" && currentWallet && (
-            <SolanaWalletActions wallet={currentWallet} />
-          )}
-
-          {selectedChain === "ethereum" && currentWallet && (
-            <EVMWalletActions wallet={currentWallet} />
-          )}
-        </View>
       </View>
     </ScreenScrollView>
   );
