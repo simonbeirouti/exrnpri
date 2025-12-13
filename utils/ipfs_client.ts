@@ -7,6 +7,7 @@
 // For local: http://localhost:3001
 // For production: https://your-deployed-server.com
 const SERVER_URL = process.env.EXPO_PUBLIC_IPFS_SERVER_URL || 'http://localhost:3001';
+const API_KEY = process.env.EXPO_PUBLIC_IPFS_API_KEY;
 
 /**
  * Upload image file to IPFS via server
@@ -26,6 +27,9 @@ export async function uploadImage(imageUri: string): Promise<string> {
 
         const response = await fetch(`${SERVER_URL}/api/upload`, {
             method: 'POST',
+            headers: {
+                'x-api-key': API_KEY || '',
+            },
             body: formData,
         });
 
@@ -90,6 +94,9 @@ export async function uploadData(
 
         const response = await fetch(`${SERVER_URL}/api/upload`, {
             method: 'POST',
+            headers: {
+                'x-api-key': API_KEY || '',
+            },
             body: formData,
         });
 
@@ -118,7 +125,11 @@ export async function uploadData(
  */
 export async function getJSON(cidString: string): Promise<any> {
     try {
-        const response = await fetch(`${SERVER_URL}/api/data/${cidString}`);
+        const response = await fetch(`${SERVER_URL}/api/data/${cidString}`, {
+            headers: {
+                'x-api-key': API_KEY || '',
+            },
+        });
 
         if (!response.ok) {
             const error = await response.json();

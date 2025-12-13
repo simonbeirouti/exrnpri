@@ -25,6 +25,36 @@ const upload = multer({ storage });
 app.use(cors());
 app.use(express.json());
 
+// API Key Authentication Middleware
+const apiKeyAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+    const validApiKey = process.env.API_KEY;
+
+    if (!validApiKey) {
+        console.error('ERROR: API_KEY not configured in environment variables');
+        return res.status(500).json({
+            error: 'Server configuration error',
+            message: 'API key not configured'
+        });
+    }
+
+    if (!apiKey) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'API key is required'
+        });
+    }
+
+    if (apiKey !== validApiKey) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Invalid API key'
+        });
+    }
+
+    next();
+};
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'IPFS server is running' });
@@ -39,7 +69,7 @@ app.get('/health', (req, res) => {
  * - description: string
  * - image: file
  */
-app.post('/api/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', apiKeyAuth, upload.single('image'), async (req, res) => {
     try {
         const { name, description } = req.body;
         const imageFile = req.file;
