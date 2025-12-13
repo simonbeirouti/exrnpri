@@ -3,8 +3,10 @@
  * Avoids React Native compatibility issues by delegating IPFS operations to a Node.js backend
  */
 
-// Server URL - update this to match your server location
-const SERVER_URL = 'http://localhost:3001';
+// Server URL - configured via environment variable
+// For local: http://localhost:3001
+// For production: https://your-deployed-server.com
+const SERVER_URL = process.env.EXPO_PUBLIC_IPFS_SERVER_URL || 'http://localhost:3001';
 
 /**
  * Upload image file to IPFS via server
@@ -41,13 +43,21 @@ export async function uploadImage(imageUri: string): Promise<string> {
 }
 
 /**
- * Get IPFS gateway URL for a CID
+ * Get IPFS gateway URL for an image CID
  * @param cidString - CID string
- * @returns Gateway URL
+ * @returns Gateway URL for image
  */
 export function getIPFSGatewayURL(cidString: string): string {
-    // Use server endpoint for images
     return `${SERVER_URL}/api/image/${cidString}`;
+}
+
+/**
+ * Get IPFS data URL for a data CID (JSON metadata)
+ * @param cidString - CID string
+ * @returns URL for retrieving JSON data
+ */
+export function getIPFSDataURL(cidString: string): string {
+    return `${SERVER_URL}/api/data/${cidString}`;
 }
 
 /**

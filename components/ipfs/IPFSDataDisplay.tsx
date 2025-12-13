@@ -6,11 +6,12 @@ import {
     StyleSheet,
     TouchableOpacity,
     Alert,
+    Linking,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import { getIPFSGatewayURL } from '@/utils/ipfs_client';
+import { getIPFSGatewayURL, getIPFSDataURL } from '@/utils/ipfs_client';
 import { FontSize, Spacing, Layout, BorderRadius } from '@/constants/Colors';
 
 interface IPFSDataDisplayProps {
@@ -35,6 +36,18 @@ export function IPFSDataDisplay({
         Alert.alert('Copied!', `${label} copied to clipboard`);
     };
 
+    const openIPFSLink = async (cid: string, type: 'data' | 'image') => {
+        // Use the appropriate URL based on the type
+        const url = type === 'data' ? getIPFSDataURL(cid) : getIPFSGatewayURL(cid);
+        const canOpen = await Linking.canOpenURL(url);
+
+        if (canOpen) {
+            await Linking.openURL(url);
+        } else {
+            Alert.alert('Error', `Cannot open ${type} URL: ${url}`);
+        }
+    };
+
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.card }]}>
             {/* Success Header */}
@@ -45,11 +58,19 @@ export function IPFSDataDisplay({
                 </Text>
             </View>
 
+            {/* Server URL Display */}
+            <View style={styles.serverInfo}>
+                <Ionicons name="server-outline" size={16} color={theme.colors.text} />
+                <Text style={[styles.serverText, { color: theme.colors.text }]}>
+                    Server: {process.env.EXPO_PUBLIC_IPFS_SERVER_URL || 'http://localhost:3001'}
+                </Text>
+            </View>
+
             {/* Image Display */}
-            {imageURL && (
+            {imageCID && (
                 <View style={styles.imageContainer}>
                     <Image
-                        source={{ uri: imageURL }}
+                        source={{ uri: getIPFSGatewayURL(imageCID) }}
                         style={styles.image}
                         resizeMode="cover"
                     />
@@ -87,6 +108,13 @@ export function IPFSDataDisplay({
                     </Text>
                     <Ionicons name="copy-outline" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.viewButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => openIPFSLink(dataCID, 'data')}
+                >
+                    <Ionicons name="open-outline" size={18} color="#FFFFFF" />
+                    <Text style={styles.viewButtonText}>View on IPFS</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.cidContainer}>
@@ -104,33 +132,13 @@ export function IPFSDataDisplay({
                     </Text>
                     <Ionicons name="copy-outline" size={20} color={theme.colors.primary} />
                 </TouchableOpacity>
-            </View>
-
-            {/* Gateway URL */}
-            <View style={styles.cidContainer}>
-                <Text style={[styles.cidLabel, { color: theme.colors.text }]}>Gateway URL:</Text>
                 <TouchableOpacity
-                    style={[styles.cidRow, { backgroundColor: theme.colors.background }]}
-                    onPress={() => copyToClipboard(imageURL, 'Gateway URL')}
+                    style={[styles.viewButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => openIPFSLink(imageCID, 'image')}
                 >
-                    <Text
-                        style={[styles.cidText, { color: theme.colors.primary }]}
-                        numberOfLines={1}
-                        ellipsizeMode="middle"
-                    >
-                        {imageURL}
-                    </Text>
-                    <Ionicons name="copy-outline" size={20} color={theme.colors.primary} />
+                    <Ionicons name="open-outline" size={18} color="#FFFFFF" />
+                    <Text style={styles.viewButtonText}>View on IPFS</Text>
                 </TouchableOpacity>
-            </View>
-
-            {/* Info Text */}
-            <View style={[styles.infoBox, { backgroundColor: theme.colors.background }]}>
-                <Ionicons name="information-circle-outline" size={20} color={theme.colors.text} />
-                <Text style={[styles.infoText, { color: theme.colors.text }]}>
-                    Your data has been uploaded to IPFS and is now accessible via the CID above.
-                    Tap any CID to copy it to your clipboard.
-                </Text>
             </View>
         </View>
     );
@@ -152,6 +160,17 @@ const styles = StyleSheet.create({
         fontSize: FontSize.lg,
         fontWeight: '700',
         flex: 1,
+    },
+    serverInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.xs,
+        marginBottom: Spacing.md,
+    },
+    serverText: {
+        fontSize: FontSize.xs,
+        opacity: 0.6,
+        fontFamily: 'monospace',
     },
     imageContainer: {
         borderRadius: BorderRadius.md,
@@ -206,5 +225,18 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: FontSize.sm,
         lineHeight: 20,
+    },
+    viewButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: Spacing.xs,
+        padding: Spacing.md,
+        borderRadius: BorderRadius.md,
+    },
+    viewButtonText: {
+        color: '#FFFFFF',
+        fontSize: FontSize.md,
+        fontWeight: '600',
     },
 });

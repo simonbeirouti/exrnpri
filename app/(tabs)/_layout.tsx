@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { BadgeProvider } from '@/context/BadgeContext';
-import { FloatingWalletButton } from '@/components/wallet/FloatingWalletButton';
+// import { FloatingWalletButton } from '@/components/wallet/FloatingWalletButton';
 
 export default function TabLayout() {
     const theme = useTheme();
@@ -11,7 +11,7 @@ export default function TabLayout() {
     return (
         <BadgeProvider>
             <View style={{ flex: 1 }}>
-                <FloatingWalletButton />
+                {/* <FloatingWalletButton /> */}
                 <Tabs
                     screenOptions={{
                         tabBarActiveTintColor: theme.colors.primary,
@@ -39,6 +39,14 @@ export default function TabLayout() {
                         }}
                     />
                     <Tabs.Screen
+                        name="ipfs"
+                        options={{
+                            tabBarLabel: "IPFS",
+                            headerShown: false,
+                            tabBarIcon: ({ color, size }) => <Ionicons name="cloud-upload" size={size} color={color} />,
+                        }}
+                    />
+                    <Tabs.Screen
                         name="settings"
                         options={{
                             tabBarLabel: "Settings",
@@ -47,14 +55,6 @@ export default function TabLayout() {
                             headerTransparent: true,
                             headerShadowVisible: false,
                             tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
-                        }}
-                    />
-                    <Tabs.Screen
-                        name="ipfs"
-                        options={{
-                            tabBarLabel: "IPFS",
-                            headerShown: false,
-                            tabBarIcon: ({ color, size }) => <Ionicons name="cloud-upload" size={size} color={color} />,
                         }}
                     />
                 </Tabs>

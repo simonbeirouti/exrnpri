@@ -7,7 +7,6 @@ import {
     uploadJSON,
     getJSON,
     getImage,
-    getGatewayURL,
     initializeHelia,
     shutdown
 } from './ipfs-client.js';
@@ -59,7 +58,10 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 
         // Upload image to IPFS
         const imageCID = await uploadImage(imageFile.buffer);
-        const imageURL = getGatewayURL(imageCID);
+
+        // Construct image URL using server endpoint
+        const serverUrl = process.env.SERVER_URL || `http://localhost:${PORT}`;
+        const imageURL = `${serverUrl}/api/image/${imageCID}`;
 
         // Create JSON metadata
         const metadata = {

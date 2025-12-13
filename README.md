@@ -46,6 +46,20 @@ Update the `app.json` file with your Privy app credentials:
 - For Expo Go development, add `host.exp.Exponent` to Allowed app identifiers in your Dashboard
 - For iOS passkey support, configure the `associatedDomains` and `passkeyAssociatedDomain`
 
+### 3a. Configure IPFS Server (Optional)
+
+If you're using IPFS functionality, configure the server URL in `.env`:
+
+```bash
+# For local development
+EXPO_PUBLIC_IPFS_SERVER_URL=http://localhost:3001
+
+# For production (after deploying your IPFS server)
+EXPO_PUBLIC_IPFS_SERVER_URL=https://your-ipfs-server.railway.app
+```
+
+**Note:** You'll need to run the IPFS server separately (see `ipfs-server/README.md`)
+
 ### 4. Start Development Server
 
 ```bash

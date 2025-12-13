@@ -14,7 +14,7 @@ interface UploadedData {
     description: string;
 }
 
-export default function IPFSPage() {
+function IPFSPage() {
     const theme = useTheme();
     const [uploadedData, setUploadedData] = useState<UploadedData | null>(null);
 
@@ -46,6 +46,9 @@ export default function IPFSPage() {
                     </Text>
                     <Text style={[styles.subtitle, { color: theme.colors.text }]}>
                         Upload data to the InterPlanetary File System
+                    </Text>
+                    <Text style={[styles.serverUrl, { color: theme.colors.text }]}>
+                        Server: {process.env.EXPO_PUBLIC_IPFS_SERVER_URL || 'http://localhost:3001'}
                     </Text>
                 </View>
 
@@ -85,7 +88,16 @@ const styles = StyleSheet.create({
         fontSize: FontSize.md,
         opacity: 0.7,
     },
+    serverUrl: {
+        fontSize: FontSize.sm,
+        opacity: 0.5,
+        fontFamily: 'monospace',
+        marginTop: Spacing.xs,
+    },
     displayContainer: {
         marginTop: Spacing.md,
     },
 });
+
+export default IPFSPage;
+

@@ -13,7 +13,13 @@ npm install
 ```bash
 # .env file is already created with defaults
 PORT=3001
-IPFS_GATEWAY=https://ipfs.io/ipfs
+
+# Server URL for generating gateway URLs
+# For local development:
+SERVER_URL=http://localhost:3001
+
+# For production (after deployment):
+# SERVER_URL=https://your-ipfs-server.railway.app
 ```
 
 ## Running the Server
