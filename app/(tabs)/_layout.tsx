@@ -49,6 +49,14 @@ export default function TabLayout() {
                             tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
                         }}
                     />
+                    <Tabs.Screen
+                        name="ipfs"
+                        options={{
+                            tabBarLabel: "IPFS",
+                            headerShown: false,
+                            tabBarIcon: ({ color, size }) => <Ionicons name="cloud-upload" size={size} color={color} />,
+                        }}
+                    />
                 </Tabs>
             </View>
         </BadgeProvider>
