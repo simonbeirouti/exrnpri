@@ -15,7 +15,7 @@ import {
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Configure multer for file uploads (store in memory)
 const storage = multer.memoryStorage();
@@ -200,8 +200,8 @@ async function startServer() {
         await initializeHelia();
 
         // Start Express server
-        app.listen(PORT, () => {
-            console.log(`\n✅ IPFS server running on http://localhost:${PORT}`);
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`\n✅ IPFS server running on http://0.0.0.0:${PORT}`);
             console.log(`\nAvailable endpoints:`);
             console.log(`  GET  /health`);
             console.log(`  POST /api/upload`);
