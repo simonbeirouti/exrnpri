@@ -31,6 +31,14 @@ export default function TabLayout() {
                         }}
                     />
                     <Tabs.Screen
+                        name="badges"
+                        options={{
+                            tabBarLabel: "Badges",
+                            headerShown: false,
+                            tabBarIcon: ({ color, size }) => <Ionicons name="shield" size={size} color={color} />,
+                        }}
+                    />
+                    <Tabs.Screen
                         name="profile"
                         options={{
                             tabBarLabel: "Profile",

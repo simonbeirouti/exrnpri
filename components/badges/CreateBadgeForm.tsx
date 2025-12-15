@@ -20,12 +20,14 @@ import { Transaction, PublicKey } from '@solana/web3.js';
 import { CreateBadgeFormData } from '@/utils/badge_types';
 import {
     createInitializeBadgeInstruction,
-    getConnection,
+    createMintBadgeInstruction,
+    getOwnedBadgeMints,
     getBadgePDA,
     getMintPDA,
     solToLamports,
     BADGE_PROGRAM_ID,
 } from '@/utils/badge_client';
+import { getConnection } from '@/utils/solana_utils';
 import { BadgePlatform } from '@/utils/badge_platform';
 import { Colors, Spacing, BorderRadius, FontSize, Layout } from '@/constants/Colors';
 import badgePlatformIdl from '@/badge_platform.json';

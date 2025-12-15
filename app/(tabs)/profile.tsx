@@ -8,13 +8,14 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { BadgeGrid } from '@/components/badges/BadgeGrid';
 import { SolanaNetworkWarning } from '@/components/badges/SolanaNetworkWarning';
 import { BadgeWithMetadata } from '@/utils/badge_types';
-import { getConnection, createBurnBadgeInstruction, getOwnedBadgeMints, BADGE_PROGRAM_ID } from '@/utils/badge_client';
+import { createBurnBadgeInstruction, BADGE_PROGRAM_ID } from '@/utils/badge_client';
 import { FontSize, Spacing, Layout } from '@/constants/Colors';
 import { useWallet } from '@/context/WalletContext';
 import { useBadgeContext } from '@/context/BadgeContext';
 import { BadgePlatform } from '@/utils/badge_platform';
 import badgePlatformIdl from '@/badge_platform.json';
-import { Ionicons } from '@expo/vector-icons';
+import { getConnection } from '@/utils/solana_utils';
+import { getOwnedBadgeMints } from '@/utils/badge_client';
 
 export default function ProfilePage() {
     const theme = useTheme();

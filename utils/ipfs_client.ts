@@ -25,7 +25,7 @@ export async function uploadImage(imageUri: string): Promise<string> {
             name: 'upload.jpg',
         } as any);
 
-        const response = await fetch(`${SERVER_URL}/api/upload`, {
+        const response = await fetch(`${SERVER_URL}/api/upload-image`, {
             method: 'POST',
             headers: {
                 'x-api-key': API_KEY || '',
@@ -141,5 +141,36 @@ export async function getJSON(cidString: string): Promise<any> {
     } catch (error) {
         console.error('Error retrieving JSON from IPFS:', error);
         throw new Error(`Failed to retrieve JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+
+/**
+ * Upload generic JSON data to IPFS via server
+ * @param data - JSON object to upload
+ * @returns Object containing the data CID
+ */
+export async function uploadJSON(data: any): Promise<{ dataCID: string }> {
+    try {
+        const response = await fetch(`${SERVER_URL}/api/upload-json`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY || '',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'JSON upload failed');
+        }
+
+        const result = await response.json();
+        return {
+            dataCID: result.dataCID,
+        };
+    } catch (error) {
+        console.error('Error uploading JSON to IPFS:', error);
+        throw new Error(`Failed to upload JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }

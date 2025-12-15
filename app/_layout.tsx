@@ -55,6 +55,7 @@ export default function RootLayout() {
           <WalletProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="create-campaign" options={{ presentation: 'modal', headerShown: false }} />
             </Stack>
           </WalletProvider>
         </AuthGuard>

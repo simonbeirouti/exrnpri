@@ -30,9 +30,9 @@ export async function uploadImage(buffer) {
     await initializeHelia();
 
     try {
-        const cid = await fsInstance.addBytes(new Uint8Array(buffer));
-        console.log('Image uploaded to IPFS:', cid.toString());
-        return cid.toString();
+        const cid = await fsInstance.addBytes(new Uint8Array(buffer), { rawLeaves: false });
+        console.log('Image uploaded to IPFS:', cid.toV0().toString());
+        return cid.toV0().toString();
     } catch (error) {
         console.error('Error uploading image:', error);
         throw error;
@@ -53,9 +53,9 @@ export async function uploadJSON(data) {
         const encoder = new TextEncoder();
         const bytes = encoder.encode(jsonString);
 
-        const cid = await fsInstance.addBytes(bytes);
-        console.log('JSON uploaded to IPFS:', cid.toString());
-        return cid.toString();
+        const cid = await fsInstance.addBytes(bytes, { rawLeaves: false });
+        console.log('JSON uploaded to IPFS:', cid.toV0().toString());
+        return cid.toV0().toString();
     } catch (error) {
         console.error('Error uploading JSON:', error);
         throw error;

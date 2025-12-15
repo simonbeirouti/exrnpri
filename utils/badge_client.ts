@@ -16,7 +16,6 @@ import { BadgePlatform } from './badge_platform';
 // Program constants from deployment
 export const BADGE_PROGRAM_ID = new PublicKey('4VsU6pPcYaJp9uBx83AjULcKShKchujxLPGAMapnf5jw');
 export const PLATFORM_WALLET = new PublicKey('2p8QvK4XLymfAFrdPxJChT5E44bKxHpsguL4K2rjJ1ZU');
-export const DEVNET_RPC = 'https://api.devnet.solana.com';
 
 /**
  * Get users owned badge mints
@@ -43,12 +42,7 @@ export async function getOwnedBadgeMints(
     return ownedMints;
 }
 
-/**
- * Get Solana Devnet connection
- */
-export function getConnection(): Connection {
-    return new Connection(DEVNET_RPC, 'confirmed');
-}
+
 
 /**
  * Derive Badge PDA

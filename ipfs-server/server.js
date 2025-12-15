@@ -61,8 +61,89 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * POST /api/upload-image
+ * Upload a raw image to IPFS
+ * 
+ * Form data:
+ * - image: file
+ */
+app.post('/api/upload-image', apiKeyAuth, upload.single('image'), async (req, res) => {
+    try {
+        const imageFile = req.file;
+
+        if (!imageFile) {
+            return res.status(400).json({
+                error: 'Missing image file'
+            });
+        }
+
+        console.log(`\n=== Upload Image Request ===`);
+        console.log(`Image size: ${imageFile.size} bytes`);
+
+        // Upload image to IPFS
+        const imageCID = await uploadImage(imageFile.buffer);
+
+        // Construct image URL using server endpoint
+        const serverUrl = process.env.SERVER_URL || `http://localhost:${PORT}`;
+        const imageURL = `${serverUrl}/api/image/${imageCID}`;
+
+        console.log(`Image CID: ${imageCID}`);
+        console.log(`=== Upload Complete ===\n`);
+
+        res.json({
+            success: true,
+            imageCID,
+            imageURL
+        });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({
+            error: 'Failed to upload image',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * POST /api/upload-json
+ * Upload generic JSON data to IPFS
+ * 
+ * Body: JSON object
+ */
+app.post('/api/upload-json', apiKeyAuth, async (req, res) => {
+    try {
+        const data = req.body;
+
+        if (!data || Object.keys(data).length === 0) {
+            return res.status(400).json({
+                error: 'Missing or empty JSON body'
+            });
+        }
+
+        console.log(`\n=== Upload JSON Request ===`);
+
+        // Upload JSON to IPFS
+        const dataCID = await uploadJSON(data);
+
+        console.log(`Data CID: ${dataCID}`);
+        console.log(`=== Upload Complete ===\n`);
+
+        res.json({
+            success: true,
+            dataCID
+        });
+    } catch (error) {
+        console.error('Upload JSON error:', error);
+        res.status(500).json({
+            error: 'Failed to upload JSON',
+            message: error.message
+        });
+    }
+});
+
+/**
  * POST /api/upload
- * Upload name, description, and image to IPFS
+ * Legacy support: Upload name, description, and image to IPFS
  * 
  * Form data:
  * - name: string
@@ -199,12 +280,16 @@ async function startServer() {
         // Initialize Helia
         await initializeHelia();
 
+        const host = process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost');
+
         // Start Express server
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`\n✅ IPFS server running on http://0.0.0.0:${PORT}`);
+        app.listen(PORT, host, () => {
+            console.log(`\n✅ IPFS server running on http://${host}:${PORT}`);
             console.log(`\nAvailable endpoints:`);
             console.log(`  GET  /health`);
-            console.log(`  POST /api/upload`);
+            console.log(`  POST /api/upload-image`);
+            console.log(`  POST /api/upload-json`);
+            console.log(`  POST /api/upload (Legacy)`);
             console.log(`  GET  /api/data/:cid`);
             console.log(`  GET  /api/image/:cid\n`);
         });
